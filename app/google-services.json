@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "123456789012",
-    "firebase_url": "https://wprd-calling-default-rtdb.firebaseio.com",
-    "project_id": "wprd-calling",
-    "storage_bucket": "wprd-calling.appspot.com"
+    "project_number": "749749171300",
+    "project_id": "wprd-call-f7b87",
+    "storage_bucket": "wprd-call-f7b87.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:123456789012:android:abcdef1234567890",
+        "mobilesdk_app_id": "1:749749171300:android:1788fc88679cc23864db71",
         "android_client_info": {
           "package_name": "com.wprd.calling"
         }
@@ -16,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDummyKeyForInitialBuild123456789"
+          "current_key": "AIzaSyALcvhjkCTEG4shIANOXhJD5vbY8ueTSac"
         }
       ],
       "services": {
