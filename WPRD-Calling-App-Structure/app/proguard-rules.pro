@@ -1,0 +1,3 @@
+-keep class org.webrtc.** { *; }
+-keep class com.wprd.calling.data.model.** { *; }
+-dontwarn org.webrtc.**

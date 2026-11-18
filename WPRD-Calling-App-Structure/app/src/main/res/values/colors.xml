@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="navy_dark">#08061F</color>
+    <color name="navy_primary">#0F0C38</color>
+    <color name="navy_surface">#18144B</color>
+    <color name="cyan_neon">#00E5FF</color>
+    <color name="cyan_dim">#3300E5FF</color>
+    <color name="text_white">#FFFFFF</color>
+    <color name="text_secondary">#9FA4C4</color>
+    <color name="call_decline_red">#EA384C</color>
+    <color name="call_answer_green">#2ECC71</color>
+</resources>
