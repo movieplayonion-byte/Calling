@@ -1,7 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/navy_dark">
-    <!-- Structure placeholder for activity_main.xml - to be updated in Phase 2 -->
+    android:background="@drawable/bg_dark_gradient">
+
+    <!-- Top Brand & Actions Bar -->
+    <TextView
+        android:id="@+id/tvAppBrand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="WPRD"
+        android:textColor="@color/text_white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/btnSearch"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_call"
+        app:layout_constraintBottom_toBottomOf="@+id/tvAppBrand"
+        app:layout_constraintEnd_toStartOf="@+id/btnSettingsMenu"
+        app:layout_constraintTop_toTopOf="@+id/tvAppBrand" />
+
+    <ImageView
+        android:id="@+id/btnSettingsMenu"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginEnd="20dp"
+        android:src="@drawable/ic_video"
+        app:layout_constraintBottom_toBottomOf="@+id/tvAppBrand"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvAppBrand" />
+
+    <!-- Tabs Layout (Calls & Contacts) -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayoutMain"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toBottomOf="@+id/tvAppBrand"
+        app:tabIndicatorColor="@color/cyan_neon"
+        app:tabSelectedTextColor="@color/cyan_neon"
+        app:tabTextColor="@color/text_secondary" />
+
+    <!-- ViewPager2 for Fragments -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPagerMain"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tabLayoutMain" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
