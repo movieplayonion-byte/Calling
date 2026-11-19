@@ -1,125 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_dark_gradient"
-    android:padding="24dp">
+    android:background="#08061F"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true">
 
-    <ImageView
-        android:id="@+id/ivLogoProfile"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="32dp"
-        android:src="@drawable/ic_wprd_logo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tvProfileTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Create Profile"
-        android:textColor="@color/text_white"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivLogoProfile" />
-
-    <!-- Circular Profile Photo Picker -->
-    <FrameLayout
-        android:id="@+id/layoutAvatar"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvProfileTitle">
-
-        <ImageView
-            android:id="@+id/ivAvatar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/bg_circle_cyan_glow"
-            android:padding="24dp"
-            android:src="@drawable/ic_call" />
-
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_gravity="bottom|end"
-            android:background="@drawable/bg_circle_cyan_glow"
-            android:padding="6dp"
-            android:src="@drawable/ic_video" />
-    </FrameLayout>
-
-    <!-- Name Input -->
     <LinearLayout
-        android:id="@+id/layoutNameInput"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="40dp"
-        android:background="@drawable/bg_input_field"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layoutAvatar">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/tvCreateProfileTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create Your Profile"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tvCreateProfileSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add your photo and name so others recognize your calls"
+            android:textColor="#A0A3BD"
+            android:textSize="14sp"
+            android:layout_marginBottom="28dp" />
+
+        <ImageView
+            android:id="@+id/ivProfilePhoto"
+            android:layout_width="112dp"
+            android:layout_height="112dp"
+            android:background="#141136"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="6dp"
+            android:scaleType="centerCrop"
+            android:src="@android:drawable/ic_menu_camera"
+            android:contentDescription="Profile Photo"
+            android:layout_marginBottom="10dp" />
+
+        <TextView
+            android:id="@+id/tvSelectPhoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="6dp"
+            android:text="Tap to choose profile photo"
+            android:textColor="#00E5FF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp" />
 
         <EditText
             android:id="@+id/etProfileName"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@null"
-            android:hint="Name"
-            android:inputType="textPersonName"
-            android:textColor="@color/text_white"
-            android:textColorHint="@color/text_secondary"
-            android:textSize="16sp" />
-    </LinearLayout>
-
-    <!-- Phone Number Input -->
-    <LinearLayout
-        android:id="@+id/layoutPhoneProfile"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/bg_input_field"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layoutNameInput">
+            android:layout_height="52dp"
+            android:background="#141136"
+            android:hint="Enter your full name"
+            android:inputType="textPersonName|textCapWords"
+            android:paddingHorizontal="16dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#6E7191"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp" />
 
         <EditText
             android:id="@+id/etProfilePhone"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@null"
-            android:hint="Phone Number (+91)"
+            android:layout_height="52dp"
+            android:background="#141136"
+            android:hint="+91XXXXXXXXXX"
             android:inputType="phone"
-            android:textColor="@color/text_white"
-            android:textColorHint="@color/text_secondary"
-            android:textSize="16sp" />
+            android:paddingHorizontal="16dp"
+            android:textColor="#D6D8E7"
+            android:textColorHint="#6E7191"
+            android:textSize="16sp"
+            android:layout_marginBottom="28dp" />
+
+        <Button
+            android:id="@+id/btnContinue"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:backgroundTint="#00E5FF"
+            android:text="Save &amp; Continue"
+            android:textAllCaps="false"
+            android:textColor="#08061F"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
     </LinearLayout>
-
-    <Button
-        android:id="@+id/btnContinue"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/bg_cyan_button"
-        android:text="Continue"
-        android:textColor="@color/navy_dark"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
