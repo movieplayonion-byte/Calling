@@ -3,17 +3,27 @@ package com.wprd.calling.ui.auth
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.wprd.calling.databinding.ActivityPhoneAuthBinding
+import com.wprd.calling.util.AppPermissionsHelper
 
 class PhoneAuthActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPhoneAuthBinding
 
+    private val permissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { _ ->
+        // Permissions requested on opening; user can continue smoothly
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPhoneAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        AppPermissionsHelper.requestAllPermissions(permissionLauncher)
 
         binding.btnNextAuth.setOnClickListener {
             val rawInput = binding.etPhoneNumber.text.toString().trim()
