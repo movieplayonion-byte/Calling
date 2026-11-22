@@ -44,12 +44,22 @@ class WebRtcClient(
 
     companion object {
         private const val TAG = "WebRtcClient"
+        // Metered TURN credentials (user's account, added 2026-11-22) so calls also
+        // connect behind strict NAT / mobile data, not just open networks.
+        private const val TURN_USERNAME = "072370e632e8dc050df33b70"
+        private const val TURN_CREDENTIAL = "u2qkp9zLPtnnFl22"
         private val ICE_SERVERS = listOf(
             PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer(),
-            PeerConnection.IceServer.builder("stun:stun1.l.google.com:19302").createIceServer()
-            // TODO(TURN): add your TURN server here for calls behind strict NAT / mobile data:
-            // PeerConnection.IceServer.builder("turn:YOUR_TURN_HOST:3478")
-            //     .setUsername("USER").setPassword("PASS").createIceServer()
+            PeerConnection.IceServer.builder("stun:stun1.l.google.com:19302").createIceServer(),
+            PeerConnection.IceServer.builder("stun:stun.relay.metered.ca:80").createIceServer(),
+            PeerConnection.IceServer.builder("turn:global.relay.metered.ca:80")
+                .setUsername(TURN_USERNAME).setPassword(TURN_CREDENTIAL).createIceServer(),
+            PeerConnection.IceServer.builder("turn:global.relay.metered.ca:80?transport=tcp")
+                .setUsername(TURN_USERNAME).setPassword(TURN_CREDENTIAL).createIceServer(),
+            PeerConnection.IceServer.builder("turn:global.relay.metered.ca:443")
+                .setUsername(TURN_USERNAME).setPassword(TURN_CREDENTIAL).createIceServer(),
+            PeerConnection.IceServer.builder("turns:global.relay.metered.ca:443?transport=tcp")
+                .setUsername(TURN_USERNAME).setPassword(TURN_CREDENTIAL).createIceServer()
         )
         @Volatile private var factoryInitialized = false
     }
