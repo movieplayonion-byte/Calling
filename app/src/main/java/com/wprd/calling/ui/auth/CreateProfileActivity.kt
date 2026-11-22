@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.wprd.calling.data.local.ProfileSyncManager
+import com.google.firebase.auth.FirebaseAuth
 import com.wprd.calling.databinding.ActivityCreateProfileBinding
 import com.wprd.calling.ui.main.MainActivity
 import kotlinx.coroutines.launch
@@ -38,9 +39,20 @@ class CreateProfileActivity : AppCompatActivity() {
         binding = ActivityCreateProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val incomingPhone = intent.getStringExtra("PHONE_NUMBER") ?: ""
+        // Profile sirf OTP-verified session ke saath banega.
+        if (FirebaseAuth.getInstance().currentUser == null) {
+            startActivity(Intent(this, PhoneAuthActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+            finish()
+            return
+        }
+
+        val incomingPhone = intent.getStringExtra("PHONE_NUMBER")
+            ?: FirebaseAuth.getInstance().currentUser?.phoneNumber ?: ""
         if (incomingPhone.isNotBlank()) {
             binding.etProfilePhone.setText(incomingPhone)
+            binding.etProfilePhone.isEnabled = false // verified number change nahi hoga
         }
 
         val initialPhone = incomingPhone.ifBlank {

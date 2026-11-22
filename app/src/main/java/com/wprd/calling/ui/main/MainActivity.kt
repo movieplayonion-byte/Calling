@@ -6,11 +6,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.wprd.calling.data.local.ProfileSyncManager
 import com.wprd.calling.data.remote.FirebaseRepository
 import com.wprd.calling.databinding.ActivityMainBinding
+import com.wprd.calling.ui.auth.PhoneAuthActivity
 import com.wprd.calling.ui.call.IncomingCallActivity
 import com.wprd.calling.ui.settings.SettingsActivity
 import com.wprd.calling.webrtc.SignalingClient
@@ -25,6 +27,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Home screen sirf verified login ke baad. Session nahi hai to OTP screen par bhejo.
+        if (FirebaseAuth.getInstance().currentUser == null) {
+            startActivity(Intent(this, PhoneAuthActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+            finish()
+            return
+        }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

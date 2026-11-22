@@ -1,10 +1,14 @@
 package com.wprd.calling.ui.settings
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.firebase.auth.FirebaseAuth
 import com.wprd.calling.data.local.ProfileSyncManager
+import com.wprd.calling.data.remote.FirebaseRepository
 import com.wprd.calling.databinding.ActivitySettingsBinding
+import com.wprd.calling.ui.auth.PhoneAuthActivity
 import kotlinx.coroutines.launch
 
 class SettingsActivity : AppCompatActivity() {
@@ -17,6 +21,16 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val phone = intent.getStringExtra("USER_PHONE") ?: ""
+        binding.btnLogout.setOnClickListener {
+            val uid = ProfileSyncManager.normalizePhoneKey(phone)
+            if (uid.isNotBlank()) FirebaseRepository().setPresence(uid, false)
+            FirebaseAuth.getInstance().signOut()
+            ProfileSyncManager.clearLocalProfile(this)
+            startActivity(Intent(this, PhoneAuthActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+            finish()
+        }
         lifecycleScope.launch {
             val profile = ProfileSyncManager.fetchProfileByPhone(this@SettingsActivity, phone)
             if (profile != null) {

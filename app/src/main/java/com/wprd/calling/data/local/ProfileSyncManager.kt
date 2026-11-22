@@ -74,6 +74,15 @@ object ProfileSyncManager {
         }
     }
 
+    /** Logout ke time local profile hata do, taaki session ke bina kuch na bache. */
+    fun clearLocalProfile(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val lastPhone = prefs.getString("last_phone", "") ?: ""
+        val key = normalizePhoneKey(lastPhone)
+        try { File(context.filesDir, "avatar_$key.jpg").delete() } catch (_: Exception) {}
+        prefs.edit().clear().apply()
+    }
+
     fun getLocalProfile(context: Context, phone: String): SyncedProfile? {
         val targetPhone = if (phone.isNotBlank()) {
             phone
