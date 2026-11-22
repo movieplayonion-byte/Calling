@@ -13,7 +13,7 @@ import org.webrtc.IceCandidate
  *
  * Layout:
  *   calls/<callId>                     -> call metadata + status + offer/answer SDP
- *   calls/<callId>/candidates/<uid>/*  -> ICE candidates published by <uid>
+ *   calls/<callId>/candidates/<uid>/...  -> ICE candidates published by <uid>
  *
  * Status flow: RINGING -> ACCEPTED -> ENDED  (or DECLINED / MISSED)
  */
