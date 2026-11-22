@@ -104,15 +104,23 @@ class PhoneAuthActivity : AppCompatActivity() {
 
         override fun onVerificationFailed(e: FirebaseException) {
             setBusy(false)
+            val detail = if (e is com.google.firebase.auth.FirebaseAuthException) {
+                "${e.errorCode} — ${e.message}"
+            } else {
+                "${e.javaClass.simpleName} — ${e.message}"
+            }
+            android.util.Log.e("PhoneAuth", "OTP verification failed: $detail", e)
             val msg = when (e) {
                 is FirebaseAuthInvalidCredentialsException ->
-                    "Number galat hai ya OTP verification fail hua. Number check karke dobara try karein."
+                    "Number galat hai ya app verification fail hua."
                 is FirebaseTooManyRequestsException ->
-                    "Bahut zyada attempts ho gaye. Kuch der baad try karein."
-                else ->
-                    "OTP bheja nahi ja saka. Internet check karein; agar phir bhi fail ho to app ko Firebase me register (SHA fingerprint) karna padega."
+                    "Aaj ke SMS ki limit (10/day) khatm ho gayi lagti hai. Kal try karein ya test number use karein."
+                else -> "OTP bheja nahi ja saka."
             }
-            Toast.makeText(this@PhoneAuthActivity, msg, Toast.LENGTH_LONG).show()
+            // Asal Firebase error screen par bhi dikhao taaki screenshot se diagnosis ho sake.
+            binding.tvAuthSubtitle.text = "$msg\nFirebase error: $detail"
+            binding.tvAuthSubtitle.setTextColor(0xFFFF8080.toInt())
+            Toast.makeText(this@PhoneAuthActivity, "$msg ($detail)", Toast.LENGTH_LONG).show()
         }
 
         override fun onCodeSent(vid: String, token: PhoneAuthProvider.ForceResendingToken) {
