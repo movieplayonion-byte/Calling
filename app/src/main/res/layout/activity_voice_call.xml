@@ -6,6 +6,22 @@
     android:background="@drawable/bg_dark_gradient"
     android:padding="24dp">
 
+    <!-- Video surfaces, shown only after a voice -> video upgrade -->
+    <org.webrtc.SurfaceViewRenderer
+        android:id="@+id/surfaceVoiceRemoteVideo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <org.webrtc.SurfaceViewRenderer
+        android:id="@+id/surfaceVoiceLocalVideo"
+        android:layout_width="100dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="48dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <!-- Caller Avatar with Glow -->
     <ImageView
         android:id="@+id/ivCallAvatar"
