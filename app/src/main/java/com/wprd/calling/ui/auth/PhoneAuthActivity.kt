@@ -151,13 +151,32 @@ class PhoneAuthActivity : AppCompatActivity() {
         }.start()
     }
 
+    private var signInSettled = false
+    private val signInWatchdog = Runnable {
+        if (!signInSettled && !isFinishing && !isDestroyed) {
+            // 30 second me koi jawab nahi — UI ko hamesha ke liye "Please wait" par mat roko.
+            setBusy(false)
+            binding.tvAuthSubtitle.text =
+                "Server se jawab nahi aaya (network slow ya database setup baki hai). Dobara try karein."
+            binding.tvAuthSubtitle.setTextColor(0xFFFF8080.toInt())
+            Toast.makeText(this, "Network slow hai, dobara try karein", Toast.LENGTH_LONG).show()
+        }
+    }
+
     private fun signIn(credential: PhoneAuthCredential) {
+        signInSettled = false
+        val handler = android.os.Handler(android.os.Looper.getMainLooper())
+        handler.postDelayed(signInWatchdog, 30_000)
         auth.signInWithCredential(credential)
             .addOnSuccessListener {
+                signInSettled = true
+                handler.removeCallbacks(signInWatchdog)
                 resendTimer?.cancel()
                 routeAfterSignIn()
             }
             .addOnFailureListener {
+                signInSettled = true
+                handler.removeCallbacks(signInWatchdog)
                 setBusy(false)
                 binding.etOtpCode.error = "Galat OTP"
                 Toast.makeText(this, "OTP galat hai, dobara try karein", Toast.LENGTH_LONG).show()

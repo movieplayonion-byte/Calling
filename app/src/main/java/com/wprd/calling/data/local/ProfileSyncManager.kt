@@ -7,6 +7,7 @@ import android.net.Uri
 import android.util.Base64
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -133,7 +134,9 @@ object ProfileSyncManager {
                 "photoBase64" to (photoBase64 ?: ""),
                 "updatedAt" to System.currentTimeMillis()
             )
-            ref.setValue(payload).await()
+            // Timeout zaroori hai: database unreachable ho to await hamesha ke liye
+            // atak sakta hai; local save ho chuka hai, user ko block mat karo.
+            withTimeoutOrNull(10_000) { ref.setValue(payload).await() }
             true
         } catch (_: Exception) {
             // Local save already succeeded so user is not blocked if offline/rules restricted
@@ -145,11 +148,14 @@ object ProfileSyncManager {
         val local = getLocalProfile(context, phone)
         val key = normalizePhoneKey(phone)
         return try {
-            val snap = FirebaseDatabase.getInstance().reference
-                .child("users")
-                .child(key)
-                .get()
-                .await()
+            // Timeout ke bina ye call database na hone par hamesha ke liye atak sakti hai.
+            val snap = withTimeoutOrNull(8_000) {
+                FirebaseDatabase.getInstance().reference
+                    .child("users")
+                    .child(key)
+                    .get()
+                    .await()
+            } ?: return local
 
             if (!snap.exists()) return local
 
