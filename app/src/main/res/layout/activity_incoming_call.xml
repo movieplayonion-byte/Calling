@@ -40,8 +40,8 @@
         android:text="Incoming Voice Call"
         android:textColor="@color/cyan_neon"
         android:textSize="16sp"
-        app:layout_constraintEndToEndOf="parent"
-        app:layout_constraintStartToStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvIncomingName" />
 
     <!-- Decline & Answer Buttons Layout -->
