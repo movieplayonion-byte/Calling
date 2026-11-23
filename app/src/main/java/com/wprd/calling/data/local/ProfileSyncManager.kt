@@ -15,7 +15,8 @@ import java.io.FileOutputStream
 data class SyncedProfile(
     val phone: String,
     val name: String,
-    val photoBase64: String?
+    val photoBase64: String?,
+    val about: String = ""
 )
 
 object ProfileSyncManager {
@@ -64,35 +65,48 @@ object ProfileSyncManager {
         }
     }
 
-    fun saveLocalProfile(context: Context, phone: String, name: String, photoBase64: String?) {
+    fun saveLocalProfile(
+        context: Context, phone: String, name: String, photoBase64: String?,
+        about: String? = null
+    ) {
         val key = normalizePhoneKey(phone)
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit()
+        val editor = prefs.edit()
             .putString("last_phone", phone)
             .putString("name_$key", name)
             .putString("phone_$key", phone)
             .putString("photo_$key", photoBase64 ?: "")
-            .apply()
+        if (about != null) editor.putString("about_$key", about)
+        editor.apply()
 
+        // Per-user avatar file (avatar_<phoneKey>.jpg): har user ki photo
+        // sirf usi ke key par rehti hai — dusre account se kabhi mix nahi hoti.
+        val avatarFile = File(context.filesDir, "avatar_$key.jpg")
         val bitmap = base64ToBitmap(photoBase64)
         if (bitmap != null) {
             try {
-                val file = File(context.filesDir, "avatar_$key.jpg")
-                FileOutputStream(file).use { fos ->
+                FileOutputStream(avatarFile).use { fos ->
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 85, fos)
                 }
             } catch (_: Exception) {
             }
+        } else if (photoBase64.isNullOrBlank()) {
+            // Photo hatayi gayi hai to purani file bhi hata do, warna stale
+            // photo isi user ko dikhti rahegi.
+            try { avatarFile.delete() } catch (_: Exception) {}
         }
     }
 
-    /** Logout ke time local profile hata do, taaki session ke bina kuch na bache. */
+    /**
+     * Logout ke time sirf session pointer (last_phone) hatao. Per-user keyed
+     * stores (name_/photo_/about_<phoneKey> aur avatar_<phoneKey>.jpg) jaan
+     * bujh kar rakhe jate hain: shared phone par dusre account ka data usi ke
+     * key par surakshit rehta hai, aur kisi dusre user ko kabhi dikhta nahi
+     * kyunki bina login ke last_phone se koi profile resolve nahi hota.
+     */
     fun clearLocalProfile(context: Context) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val lastPhone = prefs.getString("last_phone", "") ?: ""
-        val key = normalizePhoneKey(lastPhone)
-        try { File(context.filesDir, "avatar_$key.jpg").delete() } catch (_: Exception) {}
-        prefs.edit().clear().apply()
+        prefs.edit().remove("last_phone").apply()
     }
 
     fun getLocalProfile(context: Context, phone: String): SyncedProfile? {
@@ -108,6 +122,7 @@ object ProfileSyncManager {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val name = prefs.getString("name_$key", "") ?: ""
         val savedPhone = prefs.getString("phone_$key", targetPhone) ?: targetPhone
+        val about = prefs.getString("about_$key", "") ?: ""
         var photoBase64 = prefs.getString("photo_$key", "")
 
         if (photoBase64.isNullOrBlank()) {
@@ -123,16 +138,17 @@ object ProfileSyncManager {
         }
 
         if (name.isBlank() && photoBase64.isNullOrBlank()) return null
-        return SyncedProfile(savedPhone, name, photoBase64)
+        return SyncedProfile(savedPhone, name, photoBase64, about)
     }
 
     suspend fun saveAndSyncProfile(
         context: Context,
         phone: String,
         name: String,
-        photoBase64: String?
+        photoBase64: String?,
+        about: String = ""
     ): Boolean {
-        saveLocalProfile(context, phone, name, photoBase64)
+        saveLocalProfile(context, phone, name, photoBase64, about)
         val key = normalizePhoneKey(phone)
         return try {
             val ref = FirebaseDatabase.getInstance().reference
@@ -143,6 +159,7 @@ object ProfileSyncManager {
                 "phone" to phone,
                 "name" to name,
                 "photoBase64" to (photoBase64 ?: ""),
+                "about" to about,
                 "updatedAt" to System.currentTimeMillis()
             )
             // Timeout zaroori hai: database unreachable ho to await hamesha ke liye
@@ -174,9 +191,11 @@ object ProfileSyncManager {
             val remotePhone = snap.child("phone").getValue(String::class.java) ?: phone
             val remotePhoto = snap.child("photoBase64").getValue(String::class.java)
                 ?.takeIf { it.isNotBlank() } ?: local?.photoBase64
+            val remoteAbout = snap.child("about").getValue(String::class.java)
+                ?: local?.about ?: ""
 
-            saveLocalProfile(context, remotePhone, remoteName, remotePhoto)
-            SyncedProfile(remotePhone, remoteName, remotePhoto)
+            saveLocalProfile(context, remotePhone, remoteName, remotePhoto, remoteAbout)
+            SyncedProfile(remotePhone, remoteName, remotePhoto, remoteAbout)
         } catch (_: Exception) {
             local
         }

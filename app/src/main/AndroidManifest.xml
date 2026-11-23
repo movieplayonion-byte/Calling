@@ -72,6 +72,28 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:name=".ui.settings.AccountSettingsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.settings.PrivacySecurityActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.settings.HelpFeedbackActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.settings.AboutActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".ui.call.IncomingCallActivity"
             android:exported="false"
             android:launchMode="singleTop"

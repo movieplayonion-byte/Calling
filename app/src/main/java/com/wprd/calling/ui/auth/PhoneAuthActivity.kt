@@ -29,6 +29,10 @@ import java.util.concurrent.TimeUnit
  */
 class PhoneAuthActivity : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_SHOW_MESSAGE = "SHOW_MESSAGE"
+    }
+
     private lateinit var binding: ActivityPhoneAuthBinding
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
 
@@ -48,8 +52,22 @@ class PhoneAuthActivity : AppCompatActivity() {
 
         AppPermissionsHelper.requestAllPermissions(permissionLauncher)
 
+        // Signup ke baad wapas aaye hain to sandesh dikhao.
+        intent.getStringExtra(EXTRA_SHOW_MESSAGE)?.takeIf { it.isNotBlank() }?.let { msg ->
+            Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+            binding.tvAuthSubtitle.text = msg
+        }
+
         binding.btnNextAuth.setOnClickListener { startAuth() }
-        binding.tvGoToSignUp.setOnClickListener { startAuth() }
+        // Sign Up link: login wale T&C tick se iska koi lena-dena nahi —
+        // seedha signup screen kholo, bina kisi shart ke.
+        binding.tvGoToSignUp.setOnClickListener {
+            val intent = Intent(this, CreateProfileActivity::class.java).apply {
+                putExtra("AUTH_FLOW", CreateProfileActivity.FLOW_SIGN_UP_PRE)
+            }
+            startActivity(intent)
+        }
+        binding.tvChangeNumber.setOnClickListener { showPhoneStep() }
         binding.btnVerifyOtp.setOnClickListener {
             val code = binding.etOtpCode.text.toString().trim()
             val vid = verificationId
@@ -127,14 +145,28 @@ class PhoneAuthActivity : AppCompatActivity() {
             setBusy(false)
             verificationId = vid
             resendToken = token
+            // WhatsApp ki tarah: OTP step aate hi number wala hissa hide,
+            // sirf OTP wala hissa dikhe.
+            binding.layoutPhoneSection.visibility = View.GONE
             binding.layoutOtpSection.visibility = View.VISIBLE
+            binding.tvAuthTitle.text = "Enter OTP"
             binding.tvOtpInfo.text = "Enter the 6-digit OTP sent to $verifiedPhone"
-            binding.etPhoneNumber.isEnabled = false
-            binding.btnNextAuth.isEnabled = false
-            binding.btnNextAuth.text = "OTP Sent"
             startResendTimer()
             Toast.makeText(this@PhoneAuthActivity, "OTP bhej diya gaya hai", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    /** "Number badlein": OTP step se wapas number wale step par. */
+    private fun showPhoneStep() {
+        resendTimer?.cancel()
+        verificationId = null
+        resendToken = null
+        binding.etOtpCode.text?.clear()
+        binding.layoutOtpSection.visibility = View.GONE
+        binding.layoutPhoneSection.visibility = View.VISIBLE
+        binding.tvAuthTitle.text = "Enter Your Number"
+        binding.btnNextAuth.isEnabled = true
+        binding.etPhoneNumber.isEnabled = true
     }
 
     private fun startResendTimer() {

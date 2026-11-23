@@ -2,9 +2,11 @@ package com.wprd.calling.ui.settings
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
+import com.wprd.calling.BuildConfig
 import com.wprd.calling.data.local.ProfileSyncManager
 import com.wprd.calling.data.remote.FirebaseRepository
 import com.wprd.calling.databinding.ActivitySettingsBinding
@@ -20,7 +22,36 @@ class SettingsActivity : AppCompatActivity() {
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val phone = intent.getStringExtra("USER_PHONE") ?: ""
+        val phone = intent.getStringExtra("USER_PHONE")
+            ?: ProfileSyncManager.getLocalProfile(this, "")?.phone ?: ""
+
+        binding.tvAboutVersion.text = "Version ${BuildConfig.VERSION_NAME}"
+
+        binding.rowAccount.setOnClickListener {
+            startActivity(Intent(this, AccountSettingsActivity::class.java).apply {
+                putExtra("USER_PHONE", phone)
+            })
+        }
+        binding.rowPrivacy.setOnClickListener {
+            startActivity(Intent(this, PrivacySecurityActivity::class.java).apply {
+                putExtra("USER_PHONE", phone)
+            })
+        }
+        binding.rowHelp.setOnClickListener {
+            startActivity(Intent(this, HelpFeedbackActivity::class.java).apply {
+                putExtra("USER_PHONE", phone)
+            })
+        }
+        binding.rowAbout.setOnClickListener {
+            startActivity(Intent(this, AboutActivity::class.java))
+        }
+        // Header tap = account settings (photo/name yahin se badalte hain).
+        binding.ivSettingsAvatar.setOnClickListener {
+            startActivity(Intent(this, AccountSettingsActivity::class.java).apply {
+                putExtra("USER_PHONE", phone)
+            })
+        }
+
         binding.btnLogout.setOnClickListener {
             val uid = ProfileSyncManager.normalizePhoneKey(phone)
             if (uid.isNotBlank()) FirebaseRepository().setPresence(uid, false)
@@ -31,19 +62,29 @@ class SettingsActivity : AppCompatActivity() {
             })
             finish()
         }
+        loadHeader(phone)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val phone = intent.getStringExtra("USER_PHONE")
+            ?: ProfileSyncManager.getLocalProfile(this, "")?.phone ?: ""
+        loadHeader(phone)
+    }
+
+    private fun loadHeader(phone: String) {
+        if (phone.isBlank()) return
         lifecycleScope.launch {
             val profile = ProfileSyncManager.fetchProfileByPhone(this@SettingsActivity, phone)
             if (profile != null) {
-                // Mockup header: name on the first line, status beneath it.
                 if (profile.name.isNotBlank()) binding.tvSettingsName.text = profile.name
                 binding.tvSettingsStatus.text =
                     if (profile.phone.isNotBlank()) "Always Connected • ${profile.phone}"
                     else "Always Connected"
                 ProfileSyncManager.base64ToBitmap(profile.photoBase64)?.let { bmp ->
-                    val photoId = resources.getIdentifier("ivProfilePhoto", "id", packageName)
-                    if (photoId != 0) {
-                        findViewById<android.widget.ImageView>(photoId)?.setImageBitmap(bmp)
-                    }
+                    binding.ivSettingsAvatar.setPadding(0, 0, 0, 0)
+                    binding.ivSettingsAvatar.scaleType = ImageView.ScaleType.CENTER_CROP
+                    binding.ivSettingsAvatar.setImageBitmap(bmp)
                 }
             }
         }

@@ -18,13 +18,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ContactsFragment : Fragment(R.layout.fragment_contacts) {
+class ContactsFragment : Fragment(R.layout.fragment_contacts), SearchableTab {
 
     private var _binding: FragmentContactsBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: CallListAdapter
     private var registeredUsers: Map<String, User> = emptyMap()
     private var deviceContacts: List<CallListRow> = emptyList()
+    private var currentRows: List<CallListRow> = emptyList()
+    private var searchQuery: String = ""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -93,6 +95,15 @@ class ContactsFragment : Fragment(R.layout.fragment_contacts) {
         return rows.values.toList()
     }
 
+    override fun applySearch(query: String) {
+        searchQuery = query
+        if (_binding != null) submitFiltered()
+    }
+
+    private fun submitFiltered() {
+        adapter.submit(CallsFragment.filterRows(currentRows, searchQuery))
+    }
+
     private fun render() {
         if (_binding == null) return
         val rows = if (deviceContacts.isNotEmpty()) {
@@ -117,7 +128,8 @@ class ContactsFragment : Fragment(R.layout.fragment_contacts) {
                 )
             }
         }
-        adapter.submit(rows.sortedBy { it.name.lowercase() })
+        currentRows = rows.sortedBy { it.name.lowercase() }
+        submitFiltered()
     }
 
     override fun onDestroyView() {

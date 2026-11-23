@@ -7,3 +7,9 @@ local.properties
 captures/
 .externalNativeBuild/
 .cxx/
+
+# Firebase Admin service-account keys — NEVER commit these.
+server/serviceAccountKey.json
+**/serviceAccountKey*.json
+**/serviceAccount*.json
+server/node_modules/

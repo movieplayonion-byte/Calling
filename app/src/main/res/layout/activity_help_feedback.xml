@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_dark_gradient"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Help &amp; Feedback"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Aksar poochhe jaane wale sawaal (FAQ)"
+            android:textColor="#29D8F0"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:lineSpacingMultiplier="1.25"
+            android:text="Q: Call connect nahi ho rahi, kya karun?\nA: Dono phones par internet chalu rakhein aur app ko ek baar band karke dobara kholein. Phir bhi na ho to thodi der baad try karein.\n\nQ: Samne wale ka video blank dikh raha hai?\nA: App ko latest version par update karein — video wala fix naye version me aa gaya hai. Update app khud bata dega.\n\nQ: OTP nahi aa raha?\nA: Number sahi dala hai ya nahi check karein, network signal dekhein, aur 60 second ruk kar Resend OTP dabayein.\n\nQ: Kisi ki call rokni hai to?\nA: Settings → Privacy &amp; Security → Block a contact. Blocked user ki call ki ghanti nahi bajegi.\n\nQ: Profile photo kaise badlun?\nA: Settings → Account Settings me photo par tap karke nayi photo chunein."
+            android:textColor="#D6D8E7"
+            android:textSize="14sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="24dp"
+            android:background="#26FFFFFF" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Feedback bhejein"
+            android:textColor="#29D8F0"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Koi dikkat, sujhaav ya baat — yahan likhein, hum tak pahunch jayegi."
+            android:textColor="#A7A9CC"
+            android:textSize="13sp" />
+
+        <EditText
+            android:id="@+id/etFeedback"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_input_field"
+            android:gravity="top|start"
+            android:hint="Apna feedback yahan likhein…"
+            android:inputType="textMultiLine"
+            android:padding="16dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#8A8DB0"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnSendFeedback"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#29D8F0"
+            android:text="Send Feedback"
+            android:textAllCaps="false"
+            android:textColor="#150A4A"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:cornerRadius="26dp" />
+
+    </LinearLayout>
+</ScrollView>

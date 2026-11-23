@@ -44,6 +44,9 @@ class SignalingClient(private val callId: String, private val myUid: String) {
             "callerUid" to myUid,
             "callerName" to callerName,
             "callerPhone" to callerPhone,
+            // calleeUid = receiverUid hi hai; FCM sender (server/) isi naam se
+            // padhta hai. receiverUid purane code ke liye barkarar hai.
+            "calleeUid" to receiverUid,
             "receiverUid" to receiverUid,
             "receiverName" to receiverName,
             "receiverPhone" to receiverPhone,
