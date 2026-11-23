@@ -7,30 +7,46 @@
  * WhatsApp-style full-screen ringing notification.
  *
  * Config (env vars):
- *   SERVICE_ACCOUNT_PATH  path to the Firebase service-account JSON
- *                         (default: ./serviceAccountKey.json — NEVER commit it)
+ *   FIREBASE_SERVICE_ACCOUNT_JSON  the full service-account JSON as a string
+ *                         (use this on Replit: store it as a Secret — NEVER
+ *                         commit the key to git)
+ *   SERVICE_ACCOUNT_PATH  path to the Firebase service-account JSON file
+ *                         (default: ./serviceAccountKey.json)
  *   DATABASE_URL          RTDB URL (default: the WPRD project's RTDB)
+ *   PORT                  health-check HTTP port (default 3000; Replit sets
+ *                         this automatically — the HTTP endpoint lets an
+ *                         uptime pinger keep the repl awake)
  */
 const admin = require('firebase-admin');
 const fs = require('fs');
+const http = require('http');
 const path = require('path');
 
-const serviceAccountPath =
-  process.env.SERVICE_ACCOUNT_PATH || path.join(__dirname, 'serviceAccountKey.json');
 const databaseURL =
   process.env.DATABASE_URL || 'https://wprd-call-f7b87-default-rtdb.firebaseio.com';
 
-if (!fs.existsSync(serviceAccountPath)) {
-  console.error(
-    `[wprd-push] Service account file not found: ${serviceAccountPath}\n` +
-      'Download it from Firebase Console -> Project settings -> Service accounts ' +
-      '-> Generate new private key, and save it as serviceAccountKey.json ' +
-      '(see README.md).'
-  );
-  process.exit(1);
+let serviceAccount;
+if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+  try {
+    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+  } catch (err) {
+    console.error('[wprd-push] FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON:', err.message);
+    process.exit(1);
+  }
+} else {
+  const serviceAccountPath =
+    process.env.SERVICE_ACCOUNT_PATH || path.join(__dirname, 'serviceAccountKey.json');
+  if (!fs.existsSync(serviceAccountPath)) {
+    console.error(
+      `[wprd-push] Service account file not found: ${serviceAccountPath}\n` +
+        'Download it from Firebase Console -> Project settings -> Service accounts ' +
+        '-> Generate new private key, and save it as serviceAccountKey.json ' +
+        '(see README.md), or set FIREBASE_SERVICE_ACCOUNT_JSON.'
+    );
+    process.exit(1);
+  }
+  serviceAccount = require(serviceAccountPath);
 }
-
-const serviceAccount = require(serviceAccountPath);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -101,3 +117,13 @@ callsRef.on('child_added', (snap) => {
 });
 
 console.log('[wprd-push] Listening for new RINGING calls on /calls ...');
+
+// Health endpoint: keeps hosts like Replit awake via an uptime pinger and
+// gives a quick way to confirm the sender is alive.
+const port = process.env.PORT || 3000;
+http
+  .createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('wprd-push is alive\n');
+  })
+  .listen(port, () => console.log(`[wprd-push] Health endpoint on port ${port}`));

@@ -50,4 +50,17 @@ class FirebaseRepository {
     fun saveFcmToken(myUid: String, token: String) {
         db.child("users").child(myUid).child("fcmToken").setValue(token)
     }
+
+    /** Ek baar kisi user ki profile photo (base64) padhta hai — incoming call
+     *  screen par saamne wale ki photo dikhane ke liye. Na mile to null. */
+    fun fetchUserPhotoBase64(uid: String, onResult: (String?) -> Unit) {
+        if (uid.isBlank()) { onResult(null); return }
+        db.child("users").child(uid).child("photoBase64")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snap: DataSnapshot) {
+                    onResult(snap.getValue(String::class.java)?.takeIf { it.isNotBlank() })
+                }
+                override fun onCancelled(error: DatabaseError) { onResult(null) }
+            })
+    }
 }

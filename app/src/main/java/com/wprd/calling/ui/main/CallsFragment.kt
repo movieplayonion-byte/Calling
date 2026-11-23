@@ -33,9 +33,14 @@ class CallsFragment : Fragment(R.layout.fragment_calls), SearchableTab {
         binding.recyclerViewCalls.adapter = adapter
 
         val timeFormat = SimpleDateFormat("d MMM, h:mm a", Locale.getDefault())
+        // Sirf is account ke logs — doosre account ke logs yahan mix nahi honge.
+        val myKey = com.wprd.calling.data.local.ProfileSyncManager.normalizePhoneKey(
+            com.wprd.calling.data.local.ProfileSyncManager
+                .getLocalProfile(requireContext(), "")?.phone ?: ""
+        )
         viewLifecycleOwner.lifecycleScope.launch {
             AppDatabase.getInstance(requireContext()).callDao()
-                .getAllCallRecords().collectLatest { records ->
+                .getAllCallRecords(myKey).collectLatest { records ->
                     allRows = records.map { record ->
                         val label = when (record.direction) {
                             "MISSED" -> "Missed"

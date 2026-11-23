@@ -44,6 +44,7 @@ class IncomingCallActivity : AppCompatActivity() {
         val callerUid = ProfileSyncManager.normalizePhoneKey(callerPhone)
 
         binding.tvIncomingName.text = callerName
+        binding.tvIncomingPhone.text = callerPhone
         binding.tvIncomingStatus.text =
             if (callType == "VIDEO") "Incoming Video Call" else "Incoming Voice Call"
         if (callType == "VIDEO") {
@@ -51,9 +52,18 @@ class IncomingCallActivity : AppCompatActivity() {
             binding.btnAnswerCall.setImageResource(com.wprd.calling.R.drawable.ic_video_white)
             binding.tvAnswerLabel.text = "Answer Video"
         }
+        // Saamne wale ki asal profile photo: pehle local copy (agar ho), phir
+        // RTDB se uski asal photo — sirf apne account ki photo par nirbhar nahi.
         ProfileSyncManager.getLocalProfile(this, callerPhone)?.photoBase64
             ?.let { ProfileSyncManager.base64ToBitmap(it) }
             ?.let { binding.ivIncomingAvatar.setImageBitmap(it) }
+        com.wprd.calling.data.remote.FirebaseRepository().fetchUserPhotoBase64(callerUid) { base64 ->
+            val bmp = base64?.let { ProfileSyncManager.base64ToBitmap(it) }
+            if (bmp != null && !isFinishing) {
+                binding.ivIncomingAvatar.setImageBitmap(bmp)
+                binding.ivIncomingAvatar.setPadding(0, 0, 0, 0)
+            }
+        }
 
         startRinging()
         val myUid = ProfileSyncManager.normalizePhoneKey(
@@ -87,10 +97,14 @@ class IncomingCallActivity : AppCompatActivity() {
     }
 
     private fun saveMissedOrDeclined(uid: String, name: String, phone: String, type: String) {
+        val myKey = ProfileSyncManager.normalizePhoneKey(
+            ProfileSyncManager.getLocalProfile(this, "")?.phone ?: ""
+        )
         lifecycleScope.launch {
             try {
                 AppDatabase.getInstance(this@IncomingCallActivity).callDao().insertCallRecord(
                     CallRecord(
+                        ownerKey = myKey,
                         peerUid = uid, peerName = name, peerPhone = phone,
                         callType = type, direction = "MISSED",
                         timestamp = System.currentTimeMillis(), durationSeconds = 0

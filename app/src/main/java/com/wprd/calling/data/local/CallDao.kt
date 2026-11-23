@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CallDao {
-    @Query("SELECT * FROM call_records ORDER BY timestamp DESC")
-    fun getAllCallRecords(): Flow<List<CallRecord>>
+    @Query("SELECT * FROM call_records WHERE ownerKey = :ownerKey ORDER BY timestamp DESC")
+    fun getAllCallRecords(ownerKey: String): Flow<List<CallRecord>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCallRecord(record: CallRecord)

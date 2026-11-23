@@ -212,6 +212,7 @@ abstract class BaseCallActivity : AppCompatActivity() {
             try {
                 AppDatabase.getInstance(this@BaseCallActivity).callDao().insertCallRecord(
                     CallRecord(
+                        ownerKey = myUid,
                         peerUid = peerUid, peerName = peerName, peerPhone = peerPhone,
                         callType = callType, direction = direction,
                         timestamp = System.currentTimeMillis(), durationSeconds = duration

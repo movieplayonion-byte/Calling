@@ -33,6 +33,19 @@
         app:layout_constraintTop_toBottomOf="@+id/ivIncomingAvatar" />
 
     <TextView
+        android:id="@+id/tvIncomingPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="+91 98765 43210"
+        android:textColor="@color/text_white"
+        android:alpha="0.75"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvIncomingName" />
+
+    <TextView
         android:id="@+id/tvIncomingStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,7 +55,7 @@
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvIncomingName" />
+        app:layout_constraintTop_toBottomOf="@+id/tvIncomingPhone" />
 
     <!-- Decline & Answer Buttons Layout -->
     <LinearLayout

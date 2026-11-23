@@ -218,6 +218,20 @@ class WebRtcClient(
         if (renderer != null) remoteVideoTrack?.let { it.setEnabled(true); it.addSink(renderer) }
     }
 
+    /**
+     * Remote renderer ko doosre renderer se badalta hai (voice screen se
+     * video screen par jaate samay). Purane renderer se sink pehle hataya
+     * jata hai, warna track do jagah jud jata hai aur purana surface release
+     * hone par frame atak/crash ho sakta hai.
+     */
+    fun swapRemoteRenderer(renderer: SurfaceViewRenderer?) {
+        val old = remoteRenderer
+        if (old != null && old !== renderer) {
+            try { remoteVideoTrack?.removeSink(old) } catch (_: Exception) {}
+        }
+        setRemoteRenderer(renderer)
+    }
+
     fun attachRemoteVideo(track: VideoTrack, remoteRenderer: SurfaceViewRenderer?) {
         remoteVideoTrack = track
         this.remoteRenderer = remoteRenderer
