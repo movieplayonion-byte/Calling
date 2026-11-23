@@ -52,4 +52,15 @@ class VoiceCallActivity : BaseCallActivity() {
 
     override fun onStatusText(text: String) { binding.tvCallTimer.text = text }
     override fun onTimerTick(formatted: String) { binding.tvCallTimer.text = formatted }
+
+    override fun onRemoteVideoReady() {
+        // The other side turned video on mid-call (voice -> video upgrade
+        // initiated by the peer): reveal this side's video surfaces too,
+        // otherwise the peer's video renders into a GONE renderer = blank.
+        if (!videoUpgraded) {
+            binding.surfaceVoiceRemoteVideo.visibility = View.VISIBLE
+            binding.surfaceVoiceLocalVideo.visibility = View.VISIBLE
+            binding.ivCallAvatar.visibility = View.GONE
+        }
+    }
 }

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#08061F"
+    android:background="@drawable/bg_dark_gradient"
     android:fillViewport="true"
     android:fitsSystemWindows="true">
 
@@ -13,86 +14,116 @@
         android:padding="24dp"
         android:gravity="center_horizontal">
 
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/ic_wprd_logo"
+            android:contentDescription="WPRD logo" />
+
         <TextView
             android:id="@+id/tvCreateProfileTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Create Your Profile"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="Create Profile"
             android:textColor="#FFFFFF"
             android:textSize="26sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvCreateProfileSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
             android:text="Add your photo and name so others recognize your calls"
-            android:textColor="#A0A3BD"
+            android:textColor="#A7A9CC"
             android:textSize="14sp"
-            android:layout_marginBottom="28dp" />
+            android:layout_marginBottom="26dp" />
 
-        <ImageView
-            android:id="@+id/ivProfilePhoto"
-            android:layout_width="112dp"
-            android:layout_height="112dp"
-            android:background="#141136"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="6dp"
-            android:scaleType="centerCrop"
-            android:src="@android:drawable/ic_menu_camera"
-            android:contentDescription="Profile Photo"
-            android:layout_marginBottom="10dp" />
+        <!-- Avatar with camera badge -->
+        <FrameLayout
+            android:layout_width="124dp"
+            android:layout_height="124dp">
+
+            <ImageView
+                android:id="@+id/ivProfilePhoto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_avatar_placeholder"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="32dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_camera"
+                android:contentDescription="Profile Photo" />
+
+            <ImageView
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_gravity="bottom|end"
+                android:background="@drawable/bg_circle_cyan_fill"
+                android:clickable="false"
+                android:padding="8dp"
+                android:src="@drawable/ic_camera_dark"
+                android:contentDescription="Add photo" />
+        </FrameLayout>
 
         <TextView
             android:id="@+id/tvSelectPhoto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
             android:padding="6dp"
             android:text="Tap to choose profile photo"
-            android:textColor="#00E5FF"
+            android:textColor="#29D8F0"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="22dp" />
 
         <EditText
             android:id="@+id/etProfileName"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:background="#141136"
-            android:hint="Enter your full name"
+            android:layout_height="56dp"
+            android:background="@drawable/bg_input_field"
+            android:drawableStart="@drawable/ic_person"
+            android:drawablePadding="10dp"
+            android:hint="Name"
             android:inputType="textPersonName|textCapWords"
-            android:paddingHorizontal="16dp"
+            android:paddingHorizontal="18dp"
             android:textColor="#FFFFFF"
-            android:textColorHint="#6E7191"
+            android:textColorHint="#8A8DB0"
             android:textSize="16sp"
             android:layout_marginBottom="16dp" />
 
         <EditText
             android:id="@+id/etProfilePhone"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:background="#141136"
-            android:hint="+91XXXXXXXXXX"
+            android:layout_height="56dp"
+            android:background="@drawable/bg_input_field"
+            android:drawableStart="@drawable/ic_phone_field"
+            android:drawablePadding="10dp"
+            android:hint="Phone Number (+91)"
             android:inputType="phone"
-            android:paddingHorizontal="16dp"
+            android:paddingHorizontal="18dp"
             android:textColor="#D6D8E7"
-            android:textColorHint="#6E7191"
+            android:textColorHint="#8A8DB0"
             android:textSize="16sp"
             android:layout_marginBottom="28dp" />
 
         <Button
             android:id="@+id/btnContinue"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:backgroundTint="#00E5FF"
-            android:text="Save &amp; Continue"
+            android:layout_height="56dp"
+            android:backgroundTint="#29D8F0"
+            android:text="Continue"
             android:textAllCaps="false"
-            android:textColor="#08061F"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textColor="#150A4A"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            app:cornerRadius="28dp" />
 
     </LinearLayout>
 </ScrollView>

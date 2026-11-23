@@ -74,6 +74,9 @@ abstract class BaseCallActivity : AppCompatActivity() {
     abstract fun onStatusText(text: String)
     abstract fun onTimerTick(formatted: String)
 
+    /** Called (on the UI thread) when the remote party's video track arrives. */
+    protected open fun onRemoteVideoReady() {}
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         callId = intent.getStringExtra(EXTRA_CALL_ID) ?: ""
@@ -105,9 +108,10 @@ abstract class BaseCallActivity : AppCompatActivity() {
             }
             override fun onRemoteVideoTrack(track: VideoTrack) {
                 remoteVideoTrack = track
-                runOnUiThread {
-                    remoteRenderer?.let { webRtcClient?.attachRemoteVideo(track, it) }
-                }
+                // The sink attach itself is owned by WebRtcClient (it holds
+                // both the track and the renderer and joins them in either
+                // arrival order). Here we only notify the UI.
+                runOnUiThread { onRemoteVideoReady() }
             }
             override fun onConnectionConnected() {
                 runOnUiThread {
@@ -128,6 +132,9 @@ abstract class BaseCallActivity : AppCompatActivity() {
         listOf(local, remote).forEach { it?.init(client.eglContext(), null) }
         local?.setMirror(true)
         remote?.setMirror(false)
+        // Hand the remote renderer to the client so it can attach the remote
+        // video track's sink itself whenever the track arrives.
+        client.setRemoteRenderer(remote)
 
         client.createPeerConnection()
         client.startLocalMedia(local)

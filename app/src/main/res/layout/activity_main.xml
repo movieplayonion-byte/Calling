@@ -14,27 +14,29 @@
         android:layout_marginTop="20dp"
         android:text="WPRD"
         android:textColor="@color/text_white"
-        android:textSize="24sp"
+        android:textSize="26sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/btnSearch"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_call"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_marginEnd="18dp"
+        android:src="@drawable/ic_search"
+        android:contentDescription="Search"
         app:layout_constraintBottom_toBottomOf="@+id/tvAppBrand"
         app:layout_constraintEnd_toStartOf="@+id/btnSettingsMenu"
         app:layout_constraintTop_toTopOf="@+id/tvAppBrand" />
 
     <ImageView
         android:id="@+id/btnSettingsMenu"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:layout_marginEnd="20dp"
-        android:src="@drawable/ic_video"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_marginEnd="14dp"
+        android:src="@drawable/ic_more_vert"
+        android:contentDescription="Settings"
         app:layout_constraintBottom_toBottomOf="@+id/tvAppBrand"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tvAppBrand" />
@@ -48,6 +50,7 @@
         android:background="@android:color/transparent"
         app:layout_constraintTop_toBottomOf="@+id/tvAppBrand"
         app:tabIndicatorColor="@color/cyan_neon"
+        app:tabIndicatorHeight="3dp"
         app:tabSelectedTextColor="@color/cyan_neon"
         app:tabTextColor="@color/text_secondary" />
 

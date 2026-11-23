@@ -1,25 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
+    android:layout_height="76dp"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingHorizontal="16dp">
 
-    <!-- Contact Avatar -->
-    <ImageView
-        android:id="@+id/ivItemAvatar"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="@drawable/bg_circle_cyan_glow"
-        android:padding="10dp"
-        android:src="@drawable/ic_call" />
+    <!-- Contact Avatar: coloured circle with initial (set by adapter) -->
+    <FrameLayout
+        android:layout_width="52dp"
+        android:layout_height="52dp">
+
+        <ImageView
+            android:id="@+id/ivItemAvatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_avatar_circle"
+            android:contentDescription="Avatar" />
+
+        <TextView
+            android:id="@+id/tvItemInitial"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="A"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </FrameLayout>
 
     <!-- Name & Status -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="14dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
@@ -45,18 +59,20 @@
     <!-- Direct Voice Call Action -->
     <ImageView
         android:id="@+id/btnItemVoiceCall"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginEnd="16dp"
-        android:padding="6dp"
-        android:src="@drawable/ic_call" />
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="10dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_call"
+        android:contentDescription="Voice call" />
 
     <!-- Direct Video Call Action -->
     <ImageView
         android:id="@+id/btnItemVideoCall"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:padding="6dp"
-        android:src="@drawable/ic_video" />
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_video"
+        android:contentDescription="Video call" />
 
 </LinearLayout>

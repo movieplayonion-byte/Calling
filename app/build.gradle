@@ -5,6 +5,21 @@ plugins {
     id 'com.google.devtools.ksp'
 }
 
+// Fixed signing key: ONE keystore for every Muse build, stored OUTSIDE the
+// repo at ~/workspace/wprd-release.keystore (passwords in
+// ~/workspace/wprd-keystore.properties, also outside the repo, never
+// committed). Because every APK is signed with this same key, each new
+// build installs as an update over the previous one. The config is only
+// applied when the keystore files exist, so CI builds (GitHub Actions,
+// which do not have the keystore) still work with the default debug key.
+def wprdKsProps = new Properties()
+def wprdKsPropsFile = file("${rootDir}/../wprd-keystore.properties")
+def wprdKsFile = file("${rootDir}/../wprd-release.keystore")
+if (wprdKsPropsFile.exists()) {
+    wprdKsProps.load(new FileInputStream(wprdKsPropsFile))
+}
+ext.wprdSigningReady = wprdKsPropsFile.exists() && wprdKsFile.exists()
+
 android {
     namespace 'com.wprd.calling'
     compileSdk 34
@@ -13,22 +28,42 @@ android {
         applicationId "com.wprd.calling"
         minSdk 24
         targetSdk 34
-        versionCode 1
-        versionName "1.0.0"
+        versionCode 2
+        versionName "1.1.0"
 
         ndk {
             abiFilters "arm64-v8a", "armeabi-v7a"
         }
     }
 
+    signingConfigs {
+        wprd {
+            storeFile wprdKsFile
+            storePassword wprdKsProps['storePassword']
+            keyAlias wprdKsProps['keyAlias'] ?: 'wprd'
+            keyPassword wprdKsProps['keyPassword']
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            // Minify kept OFF for now: R8 adds risk around WebRTC/Firebase
+            // reflection and no size pressure exists yet. Signed release
+            // build with the fixed WPRD key (see signingConfigs above).
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (wprdSigningReady) {
+                signingConfig signingConfigs.wprd
+            }
         }
         debug {
             minifyEnabled false
+            // Same fixed key for debug too, so ANY Muse-built APK (debug or
+            // release) updates over any other without uninstalling.
+            if (wprdSigningReady) {
+                signingConfig signingConfigs.wprd
+            }
         }
     }
 
@@ -43,6 +78,9 @@ android {
 
     buildFeatures {
         viewBinding true
+        // UpdateChecker reads BuildConfig.VERSION_NAME for the
+        // GitHub-release version comparison.
+        buildConfig true
     }
 }
 

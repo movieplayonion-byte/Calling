@@ -5,108 +5,199 @@
     android:layout_height="match_parent"
     android:background="@color/navy_dark">
 
-    <!-- Remote Video Surface View Placeholder -->
+    <!-- Remote Video Surface: full-screen background layer. 0dp + constraints
+         on all four sides (ConstraintLayout does not support match_parent
+         children reliably; an unconstrained match_parent child can be
+         mis-measured and render nothing). -->
     <org.webrtc.SurfaceViewRenderer
         android:id="@+id/surfaceRemoteVideo"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Top Caller Info & Timer -->
+    <!-- Local PiP Camera Preview (Top Left, cyan border, per mockup) -->
+    <FrameLayout
+        android:id="@+id/frameLocalPreview"
+        android:layout_width="98dp"
+        android:layout_height="142dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="42dp"
+        android:background="@drawable/bg_local_preview"
+        android:padding="2dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <org.webrtc.SurfaceViewRenderer
+            android:id="@+id/surfaceLocalVideo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
+    <!-- Peer name & timer, next to the local preview -->
     <TextView
         android:id="@+id/tvVideoPeerName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginStart="14dp"
         android:text="Vikram Singh"
+        android:shadowColor="#80000000"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="3"
         android:textColor="@color/text_white"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/frameLocalPreview"
+        app:layout_constraintTop_toTopOf="@+id/frameLocalPreview" />
 
     <TextView
         android:id="@+id/tvVideoTimer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="14dp"
         android:layout_marginTop="4dp"
         android:text="04:32"
+        android:shadowColor="#80000000"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="3"
         android:textColor="@color/cyan_neon"
-        android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="15sp"
+        app:layout_constraintStart_toEndOf="@+id/frameLocalPreview"
         app:layout_constraintTop_toBottomOf="@+id/tvVideoPeerName" />
-
-    <!-- Local PiP Camera Preview (Top Right) -->
-    <org.webrtc.SurfaceViewRenderer
-        android:id="@+id/surfaceLocalVideo"
-        android:layout_width="100dp"
-        android:layout_height="150dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="48dp"
-        android:background="@drawable/bg_input_field"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Bottom Video Controls -->
     <LinearLayout
         android:id="@+id/layoutVideoControls"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="18dp"
         android:gravity="center"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/btnVideoEndCall">
+        app:layout_constraintBottom_toTopOf="@+id/layoutVideoEndCall">
 
-        <ImageView
-            android:id="@+id/btnSwitchCamera"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginHorizontal="12dp"
-            android:background="@drawable/bg_circle_cyan_glow"
-            android:padding="12dp"
-            android:src="@drawable/ic_camera_switch" />
-
-        <ImageView
-            android:id="@+id/btnVideoOff"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginHorizontal="12dp"
-            android:background="@drawable/bg_circle_cyan_glow"
-            android:padding="12dp"
-            android:src="@drawable/ic_video" />
-
-        <ImageView
-            android:id="@+id/btnVideoMute"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginHorizontal="12dp"
-            android:background="@drawable/bg_circle_cyan_glow"
-            android:padding="12dp"
-            android:src="@drawable/ic_mic_off" />
-
-        <ImageView
-            android:id="@+id/btnVideoSpeaker"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginHorizontal="12dp"
-            android:background="@drawable/bg_circle_cyan_glow"
-            android:padding="12dp"
-            android:src="@drawable/ic_speaker" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:gravity="center"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/btnSwitchCamera"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:background="@drawable/bg_circle_teal"
+                android:padding="13dp"
+                android:src="@drawable/ic_camera_switch_white"
+                android:contentDescription="Switch Camera" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Switch Camera"
+                android:textColor="@color/text_white"
+                android:textSize="11sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:gravity="center"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/btnVideoOff"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:background="@drawable/bg_circle_teal"
+                android:padding="13dp"
+                android:src="@drawable/ic_video_off_white"
+                android:contentDescription="Video Off" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Video Off"
+                android:textColor="@color/text_white"
+                android:textSize="11sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:gravity="center"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/btnVideoMute"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:background="@drawable/bg_circle_teal"
+                android:padding="13dp"
+                android:src="@drawable/ic_mic_off_white"
+                android:contentDescription="Mute" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Mute"
+                android:textColor="@color/text_white"
+                android:textSize="11sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:gravity="center"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/btnVideoSpeaker"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:background="@drawable/bg_circle_teal"
+                android:padding="13dp"
+                android:src="@drawable/ic_speaker_white"
+                android:contentDescription="Speaker" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Speaker"
+                android:textColor="@color/text_white"
+                android:textSize="11sp" />
+        </LinearLayout>
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/btnVideoEndCall"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/bg_circle_cyan_glow"
-        android:padding="18dp"
-        android:src="@drawable/ic_end_call"
+    <!-- Red End Call with label -->
+    <LinearLayout
+        android:id="@+id/layoutVideoEndCall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="26dp"
+        android:gravity="center"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:id="@+id/btnVideoEndCall"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="@drawable/bg_circle_red"
+            android:padding="18dp"
+            android:src="@drawable/ic_end_call"
+            android:contentDescription="End Call" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="End Call"
+            android:textColor="@color/text_white"
+            android:textSize="12sp" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-    

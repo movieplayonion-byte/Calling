@@ -24,7 +24,18 @@ object ProfileSyncManager {
 
     fun normalizePhoneKey(phone: String): String {
         val digits = phone.filter { it.isDigit() }
-        return if (digits.isNotEmpty()) digits else "unknown_user"
+        if (digits.isEmpty()) return "unknown_user"
+        return when {
+            // Plain 10-digit Indian mobile (e.g. a contact saved without a
+            // country code) -> prefix 91 so it matches the registered key
+            // (registered keys come from +91 numbers and are 12 digits).
+            digits.length == 10 -> "91$digits"
+            // Trunk-prefixed form 0XXXXXXXXXX (11 digits) -> drop the 0, prefix 91.
+            digits.length == 11 && digits.startsWith("0") -> "91" + digits.substring(1)
+            // Already international (e.g. 91XXXXXXXXXX) or any other
+            // international number: leave as-is.
+            else -> digits
+        }
     }
 
     fun uriToCompressedBase64(context: Context, uri: Uri): String? {

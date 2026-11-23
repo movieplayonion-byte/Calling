@@ -46,6 +46,11 @@ class IncomingCallActivity : AppCompatActivity() {
         binding.tvIncomingName.text = callerName
         binding.tvIncomingStatus.text =
             if (callType == "VIDEO") "Incoming Video Call" else "Incoming Voice Call"
+        if (callType == "VIDEO") {
+            // Mockup: green button carries a video glyph, labelled "Answer Video".
+            binding.btnAnswerCall.setImageResource(com.wprd.calling.R.drawable.ic_video_white)
+            binding.tvAnswerLabel.text = "Answer Video"
+        }
         ProfileSyncManager.getLocalProfile(this, callerPhone)?.photoBase64
             ?.let { ProfileSyncManager.base64ToBitmap(it) }
             ?.let { binding.ivIncomingAvatar.setImageBitmap(it) }

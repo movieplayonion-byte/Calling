@@ -34,10 +34,11 @@ class SettingsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val profile = ProfileSyncManager.fetchProfileByPhone(this@SettingsActivity, phone)
             if (profile != null) {
-                binding.tvSettingsStatus.text = buildString {
-                    if (profile.name.isNotBlank()) append(profile.name).append(" • ")
-                    append(profile.phone)
-                }
+                // Mockup header: name on the first line, status beneath it.
+                if (profile.name.isNotBlank()) binding.tvSettingsName.text = profile.name
+                binding.tvSettingsStatus.text =
+                    if (profile.phone.isNotBlank()) "Always Connected • ${profile.phone}"
+                    else "Always Connected"
                 ProfileSyncManager.base64ToBitmap(profile.photoBase64)?.let { bmp ->
                     val photoId = resources.getIdentifier("ivProfilePhoto", "id", packageName)
                     if (photoId != 0) {

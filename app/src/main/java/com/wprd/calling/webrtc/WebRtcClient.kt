@@ -7,6 +7,8 @@ import org.webrtc.AudioTrack
 import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraVideoCapturer
 import org.webrtc.DataChannel
+import org.webrtc.DefaultVideoDecoderFactory
+import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
 import org.webrtc.MediaStream
@@ -75,6 +77,13 @@ class WebRtcClient(
     private var videoCapturer: CameraVideoCapturer? = null
     private var surfaceTextureHelper: SurfaceTextureHelper? = null
 
+    // Remote video: the client owns both ends of the sink attach, so whichever
+    // arrives second (track from onAddTrack, or renderer from the activity)
+    // completes the connection. Attaching only from the activity callback
+    // risks a track that never gets a sink (blank remote video).
+    private var remoteVideoTrack: VideoTrack? = null
+    private var remoteRenderer: SurfaceViewRenderer? = null
+
     var isMicEnabled = true
         private set
     var isVideoEnabled = isVideoCall
@@ -95,7 +104,19 @@ class WebRtcClient(
             }
         }
         eglBase = EglBase.create()
-        factory = PeerConnectionFactory.builder().createPeerConnectionFactory()
+        // CRITICAL: the factory's video encoder/decoder MUST share this same
+        // EglBase as the SurfaceViewRenderers and the camera capturer.
+        // PeerConnectionFactory.builder() with no factories uses hardware
+        // codecs bound to the factory's own internal EGL context; remote
+        // frames decoded there are textures in a different GL context and
+        // the activity's renderer (initialised with this eglBase) draws
+        // nothing for them — the classic "local preview fine, remote video
+        // black/blank" bug. Sharing one EglBase end to end fixes it.
+        val sharedEglContext = eglBase?.eglBaseContext
+        factory = PeerConnectionFactory.builder()
+            .setVideoEncoderFactory(DefaultVideoEncoderFactory(sharedEglContext, true, true))
+            .setVideoDecoderFactory(DefaultVideoDecoderFactory(sharedEglContext))
+            .createPeerConnectionFactory()
     }
 
     fun eglContext() = eglBase?.eglBaseContext
@@ -130,7 +151,14 @@ class WebRtcClient(
             override fun onDataChannel(channel: DataChannel) {}
             override fun onRenegotiationNeeded() {}
             override fun onAddTrack(receiver: RtpReceiver, streams: Array<out MediaStream>) {
-                (receiver.track() as? VideoTrack)?.let { listener.onRemoteVideoTrack(it) }
+                (receiver.track() as? VideoTrack)?.let { track ->
+                    track.setEnabled(true)
+                    remoteVideoTrack = track
+                    // Attach immediately if the renderer is already known;
+                    // if it is set later, setRemoteRenderer() attaches then.
+                    remoteRenderer?.let { track.addSink(it) }
+                    listener.onRemoteVideoTrack(track)
+                }
             }
         })
     }
@@ -163,6 +191,9 @@ class WebRtcClient(
 
     /** Adds a video track mid-call (voice -> video upgrade) and reuses the same peer connection. */
     fun enableVideo(localRenderer: SurfaceViewRenderer?, remoteRenderer: SurfaceViewRenderer?) {
+        // Make sure the client knows the remote renderer before renegotiation,
+        // so the incoming remote video track gets its sink attached on arrival.
+        if (remoteRenderer != null) setRemoteRenderer(remoteRenderer)
         if (localVideoTrack != null) { setVideoEnabled(true); return }
         val f = factory ?: return
         val enumerator = Camera2Enumerator(context)
@@ -180,7 +211,16 @@ class WebRtcClient(
         isVideoEnabled = true
     }
 
+    /** Registers the renderer that should show the remote party's video. */
+    fun setRemoteRenderer(renderer: SurfaceViewRenderer?) {
+        remoteRenderer = renderer
+        // Track may have arrived before the renderer was set: attach now.
+        if (renderer != null) remoteVideoTrack?.let { it.setEnabled(true); it.addSink(renderer) }
+    }
+
     fun attachRemoteVideo(track: VideoTrack, remoteRenderer: SurfaceViewRenderer?) {
+        remoteVideoTrack = track
+        this.remoteRenderer = remoteRenderer
         remoteRenderer?.let { track.addSink(it) }
     }
 
@@ -246,6 +286,8 @@ class WebRtcClient(
     }
 
     fun close() {
+        remoteRenderer?.let { r -> try { remoteVideoTrack?.removeSink(r) } catch (_: Exception) {} }
+        remoteVideoTrack = null; remoteRenderer = null
         try { videoCapturer?.stopCapture() } catch (_: Exception) {}
         videoCapturer?.dispose(); videoCapturer = null
         surfaceTextureHelper?.dispose(); surfaceTextureHelper = null

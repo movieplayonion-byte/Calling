@@ -5,31 +5,45 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_dark_gradient">
 
-    <!-- App Logo / Hand Receiver Illustration Placeholder -->
+    <!-- W + signal arcs logo -->
     <ImageView
         android:id="@+id/ivSplashLogo"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:src="@drawable/ic_wprd_logo"
-        app:layout_constraintBottom_toTopOf="@+id/tvSplashTitle"
+        android:contentDescription="WPRD logo"
+        app:layout_constraintBottom_toTopOf="@+id/ivSplashHandset"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed" />
 
+    <!-- Handset mark (from the splash mockup illustration) -->
+    <ImageView
+        android:id="@+id/ivSplashHandset"
+        android:layout_width="84dp"
+        android:layout_height="84dp"
+        android:layout_marginTop="28dp"
+        android:src="@drawable/ic_call"
+        android:contentDescription="Calling"
+        app:layout_constraintBottom_toTopOf="@+id/tvSplashTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivSplashLogo" />
+
     <TextView
         android:id="@+id/tvSplashTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="28dp"
         android:text="WPRD"
         android:textColor="@color/cyan_neon"
-        android:textSize="36sp"
+        android:textSize="40sp"
         android:textStyle="bold"
-        android:letterSpacing="0.1"
+        android:letterSpacing="0.12"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivSplashLogo" />
+        app:layout_constraintTop_toBottomOf="@+id/ivSplashHandset" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

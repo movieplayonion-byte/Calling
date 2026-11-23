@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="navy_dark">#08061F</color>
-    <color name="navy_primary">#0F0C38</color>
-    <color name="navy_surface">#18144B</color>
-    <color name="cyan_neon">#00E5FF</color>
-    <color name="cyan_dim">#3300E5FF</color>
+    <color name="navy_dark">#0D0633</color>
+    <color name="navy_primary">#1B0B52</color>
+    <color name="navy_surface">#24106B</color>
+    <color name="cyan_neon">#29D8F0</color>
+    <color name="cyan_teal">#17A2BC</color>
+    <color name="cyan_dim">#3329D8F0</color>
     <color name="text_white">#FFFFFF</color>
-    <color name="text_secondary">#9FA4C4</color>
-    <color name="call_decline_red">#EA384C</color>
+    <color name="text_secondary">#A7A9CC</color>
+    <color name="call_decline_red">#E53935</color>
     <color name="call_answer_green">#2ECC71</color>
 </resources>
