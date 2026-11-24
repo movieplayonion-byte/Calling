@@ -106,12 +106,18 @@ Extra env vars for the auth API:
   API calls; also enables the verifyAccessToken double-check that
   binds a verified OTP to its phone number. Keep it in the host's
   secret env, never in git.
-- `MSG91_TOKEN_AUTH` — optional alternative credential (the widget's
-  client tokenAuth). OTP endpoints need at least one of the two; with
-  neither set they return `503 otp_not_configured`.
+- `MSG91_TOKEN_AUTH` — the widget's client tokenAuth (dashboard → OTP →
+  Widgets → SecureOTPWidget9B31 → Tokens tab; ours is the token named
+  "WPRD"). **REQUIRED for sendOtp / verifyOtp**: those APIs validate
+  the body `tokenAuth`, not the account authkey (verified live
+  2026-11-24: no tokenAuth → "Invalid request"; bogus tokenAuth →
+  AuthenticationFailure 401). The authkey header alone only
+  authenticates verifyAccessToken and getWidgetProcess. Without it,
+  OTP sends fail with `otp_send_failed` even when the authkey is set.
 - `MSG91_WIDGET_ID` — defaults to the WPRD widget id.
 
 Widget setting requirement: in the widget's dashboard settings,
 **Captcha validations** and **Invisible OTP** must be OFF and **Mobile
-Integration** ON, otherwise MSG91 rejects API sends with
-"Invalid request".
+Integration** ON for API sends. (These flags were fixed and verified
+via getWidgetProcess on 2026-11-24; the remaining "Invalid request"
+cause after that was the missing `MSG91_TOKEN_AUTH` — see above.)

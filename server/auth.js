@@ -25,11 +25,16 @@
  *                     bogus values then fail with record/token errors,
  *                     not AuthenticationFailure). This is the primary
  *                     server credential.
- *   MSG91_TOKEN_AUTH  the widget's client tokenAuth (Tokens tab). Not
- *                     needed when MSG91_AUTHKEY is set; if both are set
- *                     it is also sent in request bodies. OTP endpoints
- *                     need at least one of the two, else they return
- *                     503 otp_not_configured.
+ *   MSG91_TOKEN_AUTH  the widget's client tokenAuth (Tokens tab).
+ *                     REQUIRED for sendOtp / verifyOtp: those APIs
+ *                     validate the body tokenAuth, not the account
+ *                     authkey — verified live 2026-11-24 by probing:
+ *                     no tokenAuth in body => "Invalid request";
+ *                     bogus tokenAuth => AuthenticationFailure 401.
+ *                     The authkey header alone only authenticates
+ *                     verifyAccessToken and getWidgetProcess. Without
+ *                     MSG91_TOKEN_AUTH set, live OTP sends fail with
+ *                     otp_send_failed even when the authkey is set.
  *   MSG91_BASE_URL    override for testing (default control.msg91.com).
  */
 'use strict';
