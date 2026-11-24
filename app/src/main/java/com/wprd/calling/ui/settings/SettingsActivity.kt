@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.google.firebase.auth.FirebaseAuth
 import com.wprd.calling.BuildConfig
 import com.wprd.calling.data.local.ProfileSyncManager
 import com.wprd.calling.data.remote.FirebaseRepository
@@ -55,7 +54,14 @@ class SettingsActivity : AppCompatActivity() {
         binding.btnLogout.setOnClickListener {
             val uid = ProfileSyncManager.normalizePhoneKey(phone)
             if (uid.isNotBlank()) FirebaseRepository().setPresence(uid, false)
-            FirebaseAuth.getInstance().signOut()
+            // v1.2.0: server session revoke (best-effort) + local session saaf.
+            val sessionToken = com.wprd.calling.data.local.AuthSession.token(this)
+            com.wprd.calling.data.local.AuthSession.clear(this)
+            if (sessionToken != null) {
+                lifecycleScope.launch {
+                    com.wprd.calling.data.remote.AuthApi.logout(sessionToken)
+                }
+            }
             ProfileSyncManager.clearLocalProfile(this)
             startActivity(Intent(this, PhoneAuthActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

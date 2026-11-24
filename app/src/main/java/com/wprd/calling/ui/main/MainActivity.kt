@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.wprd.calling.data.local.BlockedUsersManager
@@ -35,8 +34,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Home screen sirf verified login ke baad. Session nahi hai to OTP screen par bhejo.
-        if (FirebaseAuth.getInstance().currentUser == null) {
+        // Home screen sirf verified login ke baad. Session nahi hai to login screen par bhejo.
+        if (!com.wprd.calling.data.local.AuthSession.isLoggedIn(this)) {
             startActivity(Intent(this, PhoneAuthActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             })

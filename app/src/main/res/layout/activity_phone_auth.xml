@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:gravity="center"
-            android:text="Enter Your Number"
+            android:text="Welcome Back"
             android:textColor="#FFFFFF"
             android:textSize="27sp"
             android:textStyle="bold" />
@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:text="We will send you an OTP for verification"
+            android:text="Login with your number and password"
             android:textColor="#A7A9CC"
             android:textSize="14sp" />
 
@@ -50,79 +50,111 @@
             android:src="@drawable/ic_lock"
             android:contentDescription="Secure login" />
 
-        <!-- Phone-number step: OTP aate hi ye pura section hide ho jata hai -->
+        <!-- Login step: number + password -->
         <LinearLayout
-            android:id="@+id/layoutPhoneSection"
+            android:id="@+id/layoutLoginSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-        <!-- Single pill field: flag + code segment | number input -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="@drawable/bg_input_field"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_input_field"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingHorizontal="14dp"
+                    android:text="🇮🇳 +91 ▾"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="28dp"
+                    android:background="#6629D8F0" />
+
+                <EditText
+                    android:id="@+id/etPhoneNumber"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:autofillHints="phone"
+                    android:background="@null"
+                    android:hint="Phone Number"
+                    android:inputType="phone"
+                    android:maxLength="15"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#8A8DB0"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_input_field"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/etPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autofillHints="password"
+                    android:background="@null"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:maxLength="64"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#8A8DB0"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/cbTermsConditions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:buttonTint="#29D8F0"
+                android:text="By continuing, you agree to our Terms &amp; Privacy Policy"
+                android:textColor="#D6D8E7"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="22dp"
+                android:backgroundTint="#29D8F0"
+                android:text="Login"
+                android:textAllCaps="false"
+                android:textColor="#150A4A"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                app:cornerRadius="28dp" />
 
             <TextView
-                android:id="@+id/tvCountryCode"
+                android:id="@+id/tvForgotPassword"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingHorizontal="14dp"
-                android:text="🇮🇳 +91 ▾"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="28dp"
-                android:background="#6629D8F0" />
-
-            <EditText
-                android:id="@+id/etPhoneNumber"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:autofillHints="phone"
-                android:background="@null"
-                android:hint="Phone Number"
-                android:inputType="phone"
-                android:maxLength="15"
-                android:paddingHorizontal="16dp"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#8A8DB0"
-                android:textSize="16sp" />
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:padding="6dp"
+                android:text="Forgot password?"
+                android:textColor="#29D8F0"
+                android:textSize="14sp" />
         </LinearLayout>
+        <!-- /layoutLoginSection -->
 
-        <CheckBox
-            android:id="@+id/cbTermsConditions"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:buttonTint="#29D8F0"
-            android:text="By continuing, you agree to our Terms &amp; Privacy Policy"
-            android:textColor="#D6D8E7"
-            android:textSize="13sp" />
-
-        <Button
-            android:id="@+id/btnNextAuth"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="22dp"
-            android:backgroundTint="#29D8F0"
-            android:text="Next"
-            android:textAllCaps="false"
-            android:textColor="#150A4A"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            app:cornerRadius="28dp" />
-
-        </LinearLayout>
-        <!-- /layoutPhoneSection -->
-
+        <!-- Forgot-password OTP step -->
         <LinearLayout
             android:id="@+id/layoutOtpSection"
             android:layout_width="match_parent"
@@ -136,7 +168,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Enter the 6-digit OTP sent to your number"
+                android:text="Enter the OTP sent to your number"
                 android:textColor="#A7A9CC"
                 android:textSize="14sp"
                 android:layout_marginBottom="12dp" />
@@ -147,9 +179,9 @@
                 android:layout_height="56dp"
                 android:background="@drawable/bg_input_field"
                 android:gravity="center"
-                android:hint="6-digit OTP"
+                android:hint="OTP"
                 android:inputType="number"
-                android:maxLength="6"
+                android:maxLength="8"
                 android:paddingHorizontal="16dp"
                 android:textColor="#FFFFFF"
                 android:textColorHint="#8A8DB0"
@@ -161,7 +193,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:backgroundTint="#29D8F0"
-                android:text="Verify &amp; Continue"
+                android:text="Verify OTP"
                 android:textAllCaps="false"
                 android:textColor="#150A4A"
                 android:textSize="16sp"
@@ -180,16 +212,68 @@
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/tvChangeNumber"
+                android:id="@+id/tvBackToLogin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:padding="6dp"
-                android:text="Galat number? Number badlein"
+                android:text="Login par wapas jayein"
                 android:textColor="#A7A9CC"
                 android:textSize="13sp"
                 android:textStyle="bold" />
         </LinearLayout>
+        <!-- /layoutOtpSection -->
+
+        <!-- Forgot-password: naya password step -->
+        <LinearLayout
+            android:id="@+id/layoutResetSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/etNewPassword"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_input_field"
+                android:hint="New Password (min 6 characters)"
+                android:inputType="textPassword"
+                android:maxLength="64"
+                android:paddingHorizontal="16dp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#8A8DB0"
+                android:textSize="16sp"
+                android:layout_marginBottom="14dp" />
+
+            <EditText
+                android:id="@+id/etConfirmNewPassword"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_input_field"
+                android:hint="Confirm New Password"
+                android:inputType="textPassword"
+                android:maxLength="64"
+                android:paddingHorizontal="16dp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#8A8DB0"
+                android:textSize="16sp"
+                android:layout_marginBottom="14dp" />
+
+            <Button
+                android:id="@+id/btnResetPassword"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:backgroundTint="#29D8F0"
+                android:text="Set New Password"
+                android:textAllCaps="false"
+                android:textColor="#150A4A"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:cornerRadius="28dp" />
+        </LinearLayout>
+        <!-- /layoutResetSection -->
 
         <LinearLayout
             android:layout_width="match_parent"

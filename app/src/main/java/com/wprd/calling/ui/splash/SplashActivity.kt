@@ -6,8 +6,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.wprd.calling.databinding.ActivitySplashBinding
+import com.wprd.calling.data.local.AuthSession
 import com.wprd.calling.data.local.ProfileSyncManager
-import com.google.firebase.auth.FirebaseAuth
 import com.wprd.calling.ui.auth.CreateProfileActivity
 import com.wprd.calling.ui.auth.PhoneAuthActivity
 import com.wprd.calling.ui.main.MainActivity
@@ -56,19 +56,22 @@ class SplashActivity : AppCompatActivity() {
     private fun navigateNext() {
         if (navigated || isFinishing || isDestroyed) return
         navigated = true
-        val user = FirebaseAuth.getInstance().currentUser
+        // v1.2.0: session hamare apne server wala hai (AuthSession),
+        // FirebaseAuth nahi. Local profile akela login NAHI hai.
+        val loggedIn = AuthSession.isLoggedIn(this@SplashActivity)
+        val sessionPhone = AuthSession.phone(this@SplashActivity) ?: ""
         val hasProfile = ProfileSyncManager.getLocalProfile(this@SplashActivity, "") != null
         when {
-            // Signed in + profile ready -> home. Back from home exits the app.
-            user != null && hasProfile ->
+            // Logged in + profile ready -> home. Back from home exits the app.
+            loggedIn && hasProfile ->
                 startActivity(Intent(this@SplashActivity, MainActivity::class.java))
-            // Signed in but profile not created yet -> finish profile first.
-            user != null -> startActivity(
+            // Logged in but profile not created yet -> finish profile first.
+            loggedIn -> startActivity(
                 Intent(this@SplashActivity, CreateProfileActivity::class.java).apply {
-                    putExtra("PHONE_NUMBER", user.phoneNumber ?: "")
+                    putExtra("PHONE_NUMBER", sessionPhone)
                 }
             )
-            // Not signed in -> OTP login. A leftover local profile alone is NOT a login.
+            // Not logged in -> password login screen.
             else -> startActivity(Intent(this@SplashActivity, PhoneAuthActivity::class.java))
         }
         finish()

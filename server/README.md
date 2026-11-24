@@ -80,3 +80,31 @@ The key does **not** exist yet and is **never** stored in this repo
 - The FCM message has a 60-second TTL and Android `priority: high`.
 - Blocked callers are filtered on the phone itself (the app checks its
   blocked list before ringing), so no server change is needed for blocking.
+
+## Auth API (v1.2.0+, in auth.js)
+
+The same process also serves the app's login system under `/auth/*`
+(every other path still returns the health text):
+
+- `POST /auth/otp/send` `{phone, purpose: "signup"|"reset"}` — sends an
+  SMS OTP through MSG91's OTP Widget APIs (default widget config, so no
+  DLT registration is needed). Rate limited (cooldown + daily caps).
+- `POST /auth/otp/verify` `{phone, otp}` — verifies via MSG91 and
+  returns a one-time 10-minute `grantToken`.
+- `POST /auth/signup` `{phone, grantToken, name, password}` — creates
+  the account (scrypt-hashed password) and returns a session token.
+- `POST /auth/login` `{phone, password}` — daily login, NO OTP.
+- `POST /auth/reset` `{phone, grantToken, newPassword}` — forgot
+  password; revokes all existing sessions.
+- `POST /auth/logout` `{sessionToken}`, `GET /auth/session?token=...`
+
+Extra env vars for the auth API:
+
+- `MSG91_TOKEN_AUTH` — **required** for OTP: the value of the widget
+  token named "WPRD" (MSG91 dashboard → OTP → Widgets →
+  SecureOTPWidget9B31 → Tokens). Without it the OTP endpoints return
+  `503 otp_not_configured`. Keep it in the host's secret env, never in
+  git.
+- `MSG91_AUTHKEY` — optional; enables the verifyAccessToken
+  double-check that binds a verified OTP to its phone number.
+- `MSG91_WIDGET_ID` — defaults to the WPRD widget id.

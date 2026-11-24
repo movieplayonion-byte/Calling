@@ -21,6 +21,7 @@ const admin = require('firebase-admin');
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
+const { createAuthHandler } = require('./auth');
 
 const databaseURL =
   process.env.DATABASE_URL || 'https://wprd-call-f7b87-default-rtdb.firebaseio.com';
@@ -119,10 +120,23 @@ callsRef.on('child_added', (snap) => {
 console.log('[wprd-push] Listening for new RINGING calls on /calls ...');
 
 // Health endpoint: keeps hosts like Replit awake via an uptime pinger and
-// gives a quick way to confirm the sender is alive.
+// gives a quick way to confirm the sender is alive. The same server also
+// serves the v1.2.0 auth API under /auth/* (MSG91 OTP + password login,
+// see auth.js); every other path keeps the plain health response.
+const handleAuth = createAuthHandler(db);
 const port = process.env.PORT || 3000;
 http
   .createServer((req, res) => {
+    if (req.url && req.url.startsWith('/auth/')) {
+      handleAuth(req, res).catch((err) => {
+        console.error('[wprd-push] auth error:', err.message);
+        if (!res.headersSent) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: false, error: 'server_error' }));
+        }
+      });
+      return;
+    }
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('wprd-push is alive\n');
   })
