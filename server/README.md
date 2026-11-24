@@ -100,11 +100,18 @@ The same process also serves the app's login system under `/auth/*`
 
 Extra env vars for the auth API:
 
-- `MSG91_TOKEN_AUTH` — **required** for OTP: the value of the widget
-  token named "WPRD" (MSG91 dashboard → OTP → Widgets →
-  SecureOTPWidget9B31 → Tokens). Without it the OTP endpoints return
-  `503 otp_not_configured`. Keep it in the host's secret env, never in
-  git.
-- `MSG91_AUTHKEY` — optional; enables the verifyAccessToken
-  double-check that binds a verified OTP to its phone number.
+- `MSG91_AUTHKEY` — the widget's server-side authkey (MSG91 dashboard →
+  OTP → Widgets → SecureOTPWidget9B31 → Server Side Integration; ours
+  is named "WPRDServer"). Sent as the `authkey` header on all widget
+  API calls; also enables the verifyAccessToken double-check that
+  binds a verified OTP to its phone number. Keep it in the host's
+  secret env, never in git.
+- `MSG91_TOKEN_AUTH` — optional alternative credential (the widget's
+  client tokenAuth). OTP endpoints need at least one of the two; with
+  neither set they return `503 otp_not_configured`.
 - `MSG91_WIDGET_ID` — defaults to the WPRD widget id.
+
+Widget setting requirement: in the widget's dashboard settings,
+**Captcha validations** and **Invisible OTP** must be OFF and **Mobile
+Integration** ON, otherwise MSG91 rejects API sends with
+"Invalid request".

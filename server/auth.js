@@ -5,7 +5,7 @@
  * v120-auth-design.md. In short:
  *   - OTP send/verify is proxied through MSG91's OTP *Widget* APIs
  *     (default widget config => MSG91's own DLT sender/template, no DLT
- *     registration needed on our side). The widget tokenAuth never
+ *     registration needed on our side). The server authkey never
  *     leaves this server.
  *   - After MSG91 verifies an OTP, this server mints its own one-time
  *     "grant" token (10 min, purpose-bound) that the app exchanges for
@@ -16,13 +16,20 @@
  * Config (env vars):
  *   MSG91_WIDGET_ID   widget id (default: the WPRD widget created
  *                     2026-11-24, "SecureOTPWidget9B31")
- *   MSG91_TOKEN_AUTH  the widget's token value (dashboard: OTP ->
- *                     Widgets -> SecureOTPWidget9B31 -> Tokens -> the
- *                     token named "WPRD"). REQUIRED for OTP endpoints;
- *                     without it they return 503 otp_not_configured.
- *   MSG91_AUTHKEY     account authkey (optional). When set, the JWT
- *                     from verifyOtp is double-checked via
- *                     verifyAccessToken and bound to the phone number.
+ *   MSG91_AUTHKEY     the widget's server-side authkey (dashboard: OTP ->
+ *                     Widgets -> SecureOTPWidget9B31 -> Server Side
+ *                     Integration; ours is named "WPRDServer"). Sent as
+ *                     the `authkey` header on every widget API call —
+ *                     MSG91 accepts it for sendOtp / verifyOtp /
+ *                     verifyAccessToken (verified live 2026-11-24:
+ *                     bogus values then fail with record/token errors,
+ *                     not AuthenticationFailure). This is the primary
+ *                     server credential.
+ *   MSG91_TOKEN_AUTH  the widget's client tokenAuth (Tokens tab). Not
+ *                     needed when MSG91_AUTHKEY is set; if both are set
+ *                     it is also sent in request bodies. OTP endpoints
+ *                     need at least one of the two, else they return
+ *                     503 otp_not_configured.
  *   MSG91_BASE_URL    override for testing (default control.msg91.com).
  */
 'use strict';
@@ -36,7 +43,7 @@ const AUTHKEY = process.env.MSG91_AUTHKEY || '';
 
 const SESSION_TTL_MS = 30 * 24 * 3600 * 1000; // 30 days
 const GRANT_TTL_MS = 10 * 60 * 1000; // 10 minutes
-const OTP_TTL_MS = 10 * 60 * 1000; // matches the widget's OTP lifetime
+const OTP_TTL_MS = 15 * 60 * 1000; // matches the widget's expiryTime (15 min, per getWidgetProcess)
 const SEND_COOLDOWN_MS = { signup: 60 * 1000, reset: 5 * 60 * 1000 };
 const DAILY_SEND_CAP = { signup: 5, reset: 3 };
 const MAX_VERIFY_ATTEMPTS = 5;
@@ -142,20 +149,34 @@ function msg91Ok(result) {
   return result && result.data && result.data.type === 'success';
 }
 
+/** Widget API auth: the server authkey travels in the `authkey` header;
+ *  the client tokenAuth (if configured) rides in the body as well. */
+function widgetAuthHeaders() {
+  return AUTHKEY ? { authkey: AUTHKEY } : {};
+}
+
+function widgetBody(fields) {
+  return {
+    widgetId: WIDGET_ID,
+    ...(TOKEN_AUTH ? { tokenAuth: TOKEN_AUTH } : {}),
+    ...fields,
+  };
+}
+
 // ------------------------------------------------------------ the handler
 
 function createAuthHandler(db) {
-  if (!TOKEN_AUTH) {
+  if (!TOKEN_AUTH && !AUTHKEY) {
     console.warn(
-      '[wprd-auth] MSG91_TOKEN_AUTH is not set: OTP endpoints will return ' +
-        '503 otp_not_configured. Get the value from MSG91 dashboard -> OTP -> ' +
-        'Widgets -> SecureOTPWidget9B31 -> Tokens -> token "WPRD".'
+      '[wprd-auth] Neither MSG91_AUTHKEY nor MSG91_TOKEN_AUTH is set: OTP ' +
+        'endpoints will return 503 otp_not_configured. Get the authkey from ' +
+        'MSG91 dashboard -> OTP -> Widgets -> SecureOTPWidget9B31 -> Server ' +
+        'Side Integration.'
     );
-  }
-  if (!AUTHKEY) {
-    console.warn(
-      '[wprd-auth] MSG91_AUTHKEY is not set: verifyAccessToken double-check ' +
-        'disabled (verifyOtp result is trusted; reqId is server-issued per phone).'
+  } else if (AUTHKEY) {
+    console.log(
+      '[wprd-auth] MSG91 authkey configured: widget APIs use authkey-header ' +
+        'auth; verifyAccessToken phone-binding check is ON.'
     );
   }
 
@@ -188,7 +209,7 @@ function createAuthHandler(db) {
     if (!phoneKey || phoneKey.length < 10) {
       return sendJson(res, 400, { ok: false, error: 'invalid_phone' });
     }
-    if (!TOKEN_AUTH) {
+    if (!TOKEN_AUTH && !AUTHKEY) {
       return sendJson(res, 503, { ok: false, error: 'otp_not_configured' });
     }
 
@@ -219,11 +240,7 @@ function createAuthHandler(db) {
 
     let result;
     try {
-      result = await msg91Post('/sendOtp', {
-        widgetId: WIDGET_ID,
-        tokenAuth: TOKEN_AUTH,
-        identifier: phoneKey,
-      });
+      result = await msg91Post('/sendOtp', widgetBody({ identifier: phoneKey }), widgetAuthHeaders());
     } catch (err) {
       console.error('[wprd-auth] MSG91 sendOtp failed:', err.message);
       return sendJson(res, 502, { ok: false, error: 'otp_send_failed' });
@@ -260,7 +277,7 @@ function createAuthHandler(db) {
     if (!phoneKey || !/^\d{4,8}$/.test(otp)) {
       return sendJson(res, 400, { ok: false, error: 'invalid_request' });
     }
-    if (!TOKEN_AUTH) {
+    if (!TOKEN_AUTH && !AUTHKEY) {
       return sendJson(res, 503, { ok: false, error: 'otp_not_configured' });
     }
 
@@ -279,12 +296,11 @@ function createAuthHandler(db) {
 
     let result;
     try {
-      result = await msg91Post('/verifyOtp', {
-        widgetId: WIDGET_ID,
-        tokenAuth: TOKEN_AUTH,
-        reqId: otpState.reqId,
-        otp,
-      });
+      result = await msg91Post(
+        '/verifyOtp',
+        widgetBody({ reqId: otpState.reqId, otp }),
+        widgetAuthHeaders()
+      );
     } catch (err) {
       console.error('[wprd-auth] MSG91 verifyOtp failed:', err.message);
       return sendJson(res, 502, { ok: false, error: 'otp_verify_failed' });
